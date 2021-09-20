@@ -1,0 +1,90 @@
+import pandas as pd
+import numpy as np
+import plotly.express as px
+import os
+from sklearn.cluster import KMeans
+
+
+AantalKlusters=5
+
+#
+WorkingDirCDrive='C:/temp/summerschool'
+if os.path.exists( WorkingDirCDrive ):
+  WorkingDir = WorkingDirCDrive
+# 
+DiagramFileName= WorkingDir + '/diagrams/dairy-kmeans.png'
+ExcelFileName=WorkingDir + '/sampledata/yoghurt.xlsx'
+print ( DiagramFileName )
+
+#
+df0 = pd.read_excel( ExcelFileName  , sheet_name='Customer' , header=0 , engine='openpyxl'  )
+print( df0.head() )
+
+# alles
+df1 = df0[ df0["CUSTOMER_POSTAL_CODE"] != "0000" ]
+
+# sunburst does not support nodes which are NULL or NaN
+df2 = df1.replace( np.nan, '', regex=True)
+#
+
+#
+df3 = df2[['CUSTOMER_ID','CUSTOMER_REGION_COORD_X','CUSTOMER_REGION_COORD_Y']]
+print ( df3.head )
+
+
+#
+kmeans = KMeans(n_clusters=AantalKlusters, random_state=0).fit( df3 )
+print( kmeans )
+    
+# Get the cluster labels
+print("dit zijn de labels")
+print(kmeans.labels_)
+
+# we gaan de input data nu proberen te mergen met de labels
+# kmeans result is een array, dus omzetten naar pandas dataframe
+dflabels = pd.DataFrame( kmeans.labels_ , columns = ['ClusterNummer'])
+print( dflabels.head() )
+
+# plak het rijnummer aan iedere rij
+df3['RijNummer'] = df3.reset_index().index
+print( df3.head() )
+dflabels['RijNummer'] = dflabels.reset_index().index
+print( dflabels.head() )
+
+# joinen
+df5 = pd.merge( df3 , dflabels , on="RijNummer" )
+print( df5.head() )
+
+# Voeg een kolom toe die de grootte van de dot definieert
+df5['Grootte'] = 15
+
+# CUSTOMER_ID  CUSTOMER_REGION_COORD_X  CUSTOMER_REGION_COORD_Y  RijNummer  ClusterNummer Grootte
+
+#
+print("Dit zijn de centroids")
+print(kmeans.cluster_centers_)
+dfcentroids = pd.DataFrame( kmeans.cluster_centers_ , columns = ['SILLY','CUSTOMER_REGION_COORD_X','CUSTOMER_REGION_COORD_Y'])
+print( dfcentroids.head() )
+
+# herwerk de centroids datafram zodat die past op de df5 data frame - zet de grootte 
+df10 = dfcentroids[['CUSTOMER_REGION_COORD_X','CUSTOMER_REGION_COORD_Y']]
+df10['ClusterNummer'] = AantalKlusters + 1  # zet hoog
+df10['Grootte'] = 50
+print( df10.head() )
+
+# achteraan toevoegen - 
+df100 = pd.concat([df5, df10], ignore_index=True, sort=False)
+print( df100 )
+
+
+#
+fig = px.scatter( df100 , x="CUSTOMER_REGION_COORD_X", y="CUSTOMER_REGION_COORD_Y" , color="ClusterNummer", size_max=50 , size="Grootte" )
+fig.update_layout( title='K-Means op de geo coordinaten')
+#fig.update_traces(marker={'size': 15})
+
+fig.write_image( DiagramFileName , width=1980, height=1080 )
+
+
+quit()
+
+

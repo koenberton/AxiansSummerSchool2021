@@ -1,0 +1,60 @@
+from pyvis.network import Network
+import pandas as pd
+import os
+
+
+#
+WorkingDirCDrive='C:/temp/summerschool'
+if os.path.exists( WorkingDirCDrive ):
+  WorkingDir = WorkingDirCDrive
+# 
+HTMLFileName= WorkingDir + '/diagrams/casper03.html'
+ExcelFileName=WorkingDir + '/sampledata/ML_samples.xlsx'
+
+
+#
+got_data = pd.read_excel( ExcelFileName  , sheet_name='casper' , header=0 , engine='openpyxl'  )
+print( got_data.head() )
+
+#got_net = Network(height='750px', width='100%', bgcolor='#222222', font_color='white')
+got_net = Network(height='750px', width='100%', bgcolor='lightgray', font_color='black')
+
+
+# set the physics layout of the network
+got_net.barnes_hut()
+
+sources = got_data['ParentUID']
+targets = got_data['UID']
+labels  = got_data['Content']
+
+edge_data = zip(sources, targets, labels)
+
+# koen - werkt enkel met uid in STRING formaat + de UID is hetgeen gedisplayed wordt
+# koen - en de relatie is omgekeerd
+for e in edge_data:
+  src = '[UID' + str(e[0]) + ']' 
+  dst = '[UID' + str(e[1]) + ']'
+  w   = 1
+  #print( src + " " + dst + " " + lbl )
+  got_net.add_node(src, src, title=src)
+  got_net.add_node(dst, dst, title=dst)
+  got_net.add_edge(src, dst, value=w)
+
+# ?? koen
+neighbor_map = got_net.get_adj_list()
+
+# add neighbor data to node hover data
+for node in got_net.nodes:
+  #node['title'] += ' Neighbors:<br>' + '<br>'.join(neighbor_map[node['id']])
+  #node['value'] = len(neighbor_map[node['id']])
+  stgt = node['id']
+  for index, row in got_data.iterrows():
+    #print(row["UID"], row["Content"])
+    xtgt = '[UID' + str(row["UID"]) + ']'
+    if( stgt == xtgt ) :
+      #print ( xtgt + " " + row["Content"] )
+      node['title'] = row["Content"]
+	
+got_net.show( HTMLFileName )
+print( HTMLFileName + ' created');
+quit()

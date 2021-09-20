@@ -1,0 +1,122 @@
+import pandas as pd
+import numpy as np
+import plotly.express as px
+import os
+from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
+
+AantalKlusters=2
+
+#
+WorkingDirCDrive='C:/temp/summerschool'
+if os.path.exists( WorkingDirCDrive ):
+  WorkingDir = WorkingDirCDrive
+# 
+DiagramFileName= WorkingDir + '/diagrams/casper-kmeans.png'
+ElbowDiagram= WorkingDir + '/diagrams/casper-elbow.png'
+ExcelFileName=WorkingDir + '/sampledata/ML_samples.xlsx'
+print ( DiagramFileName )
+
+#
+df0 = pd.read_excel( ExcelFileName  , sheet_name='casper' , header=0 , engine='openpyxl'  )
+print( df0.head() )
+
+# enkel de connected components
+df1 = df0[ df0["Tipe"] == "ConCom" ]
+
+# sunburst does not support nodes which are NULL or NaN
+df2 = df1.replace( np.nan, '?', regex=True)
+#
+
+#
+df3 = df2[['CoordX','CoordY','Width','Height']]
+print ( df3.head() )
+
+# normaliseer (wat er te normaliseren valt)
+df3norm=(df3 - df3.mean()) / df3.std()
+
+# laat iedere rij voorafgaan door rijnummer
+df3norm.insert( 0 , 'RijNummer' , df3norm.reset_index().index )
+print( "norm" )
+print ( df3norm.head() )
+
+# cluster op de hoogte
+df4=df3norm[['Height']]
+print ( df4.head() )
+
+# optimal k
+# bereken de intertie per cluster = de som van de kwadraat afstanden 
+# de knik betekent dat de optimisatie niet langer toeneemt
+# https://blog.cambridgespark.com/how-to-determine-the-optimal-number-of-clusters-for-k-means-clustering-14f27070048f
+Sum_of_squared_distances = []
+K = range(1,15)
+for k in K:
+    km = KMeans(n_clusters=k)
+    km = km.fit(df4)
+    Sum_of_squared_distances.append(km.inertia_)
+
+plt.plot(K, Sum_of_squared_distances, 'bx-')
+plt.xlabel('k')
+plt.ylabel('Sum_of_squared_distances')
+plt.title('Elbow Method For Optimal k')
+#plt.show()
+
+
+#
+dfssd = pd.DataFrame( Sum_of_squared_distances , columns = ['inertie'])
+dfssd['k'] = dfssd.reset_index().index
+fig = px.line( dfssd, x="k", y="inertie")
+fig.update_traces(textposition="bottom right")
+fig.write_image( ElbowDiagram , width=1000, height=800 )
+
+
+#
+kmeans = KMeans(n_clusters=AantalKlusters, random_state=0).fit( df4 )
+print( kmeans )
+    
+# Get the cluster labels
+print("dit zijn de labels")
+print(kmeans.labels_)
+
+# we gaan de input data nu proberen te mergen met de labels
+# kmeans result is een array, dus omzetten naar pandas dataframe
+dflabels = pd.DataFrame( kmeans.labels_ , columns = ['ClusterNummer'])
+print( dflabels.head() )
+
+# plak het rijnummer aan iedere rij
+df3.insert( 0 , 'RijNummer' , df3.reset_index().index )
+print( df3.head() )
+#
+#dflabels( 0 , 'RijNummer' , dflabels.reset_index().index )
+dflabels['RijNummer'] = dflabels.reset_index().index
+print( dflabels.head() )
+
+# joinen
+df5 = pd.merge( df3 , dflabels , on="RijNummer" )
+
+# Voeg een kolom toe die de grootte van de dot definieert
+df5['Grootte'] = 1
+print("resultaat")
+# RijNummer  CoordX  CoordY  Width  Height  ClusterNummer  Grootte
+print( df5.head() )
+
+#
+print("Dit zijn de centroids")
+print(kmeans.cluster_centers_)
+#dfcentroids = pd.DataFrame( kmeans.cluster_centers_ , columns = ['SillyUID','Height'])
+#print( dfcentroids.head() )
+
+
+#
+df100=df5
+df5['JavaCoordY'] = 554 - df5['CoordY']
+fig = px.scatter( df100 , x="CoordX", y= "JavaCoordY" , color="ClusterNummer", size_max=50  )
+fig.update_layout( title='K-Means connected component hoogte')
+#fig.update_traces(marker={'size': 15})
+
+fig.write_image( DiagramFileName , width=587, height=554 )
+
+
+quit()
+
+

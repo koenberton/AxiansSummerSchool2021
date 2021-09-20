@@ -1,0 +1,29 @@
+import pandas as pd
+import numpy as np
+import plotly.express as px
+import os
+
+#
+WorkingDirCDrive='C:/temp/summerschool'
+if os.path.exists( WorkingDirCDrive ):
+  WorkingDir = WorkingDirCDrive
+# 
+DiagramFileName= WorkingDir + '/diagrams/abalone-02.png'
+ExcelFileName=WorkingDir + '/sampledata/ML_samples.xlsx'
+print ( DiagramFileName )
+
+
+
+df0 = pd.read_excel( ExcelFileName  , sheet_name='Abalone' , header=0 , engine='openpyxl'  )
+print( df0.head() )
+
+
+fig = px.scatter(df0, x="Length", y="ShellWeight"  , color="Gender", size_max=50 , title="Abalone-Length-Shellweight Ordinary Least Square regression" , trendline="ols" ,  trendline_color_override='darkblue' )
+
+#fig.update_xaxes(categoryorder='category ascending')
+#fig.update_yaxes(categoryorder='category ascending')
+#fig.title("");
+
+fig.write_image( DiagramFileName , width=1980, height=1080 )
+
+quit()

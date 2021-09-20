@@ -1,0 +1,45 @@
+import pandas as pd
+import numpy as np
+import plotly.express as px
+import os
+
+#
+WorkingDirCDrive='C:/temp/summerschool'
+if os.path.exists( WorkingDirCDrive ):
+  WorkingDir = WorkingDirCDrive
+# 
+DiagramFileName= WorkingDir + '/diagrams/Covid-04.png'
+ExcelFileName=WorkingDir + '/sampledata/covid.xlsx'
+print ( DiagramFileName )
+
+# toont de ketting van dataframes
+#
+df0 = pd.read_excel( ExcelFileName  , sheet_name='HOSP' , header=0 , engine='openpyxl'  )
+print( df0.head() )
+
+# overschrijf de blanks
+df1 = df0.replace( np.nan, '0', regex=True)
+
+# voorbeeld van een filter
+df2 = df1[ df0["PROVINCE"] != "Limburg" ]
+
+#
+grouped = df2.groupby(['DATUM','PROVINCE'])['TOTAL_IN'].agg([np.count_nonzero, np.mean, np.std , np.sum])
+df3 = grouped.reset_index()
+print ( df3 );
+
+#
+fig = px.bar( df3, y='sum', x='DATUM',  color='PROVINCE')
+
+fig.update_layout( title='Ziekenhuisopnames per dag (zonder Limburg)')
+fig.update_layout( barmode='stack')   # or group indien je naast elkaar wil
+fig.update_layout( bargap=0.05 )  # gap between bars of adjacent location coordinates.
+fig.update_layout( bargroupgap=0.15 ) # gap between bars of the same location coordinate
+
+#fig.update_traces(texttemplate='%{text:.2s}', textposition='outside')
+#fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide')
+#fig.show()
+
+fig.write_image( DiagramFileName , width=1980, height=1080 )
+
+quit()

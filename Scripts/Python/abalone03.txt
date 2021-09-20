@@ -1,0 +1,30 @@
+import pandas as pd
+import numpy as np
+import plotly.express as px
+import os
+
+#
+WorkingDirCDrive='C:/temp/summerschool'
+if os.path.exists( WorkingDirCDrive ):
+  WorkingDir = WorkingDirCDrive
+# 
+DiagramFileName= WorkingDir + '/diagrams/abalone-03.png'
+ExcelFileName=WorkingDir + '/sampledata/ML_samples.xlsx'
+print ( DiagramFileName )
+
+#
+df0 = pd.read_excel( ExcelFileName  , sheet_name='Abalone' , header=0 , engine='openpyxl'  )
+print( df0.head() )
+
+# full documentatie
+# https://towardsdatascience.com/histograms-with-plotly-express-complete-guide-d483656c5ad7
+#
+fig = px.histogram(df0, x="Length", color="Gender" , nbins=40 , title="Abalone - Length - 40 bins - mode:grouped" , barmode="group" )
+
+#fig.update_xaxes(categoryorder='category ascending')
+#fig.update_yaxes(categoryorder='category ascending')
+#fig.title("Lenght histogram - 40 bins");
+
+fig.write_image( DiagramFileName , width=1980, height=1080 )
+
+quit()

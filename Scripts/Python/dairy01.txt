@@ -1,0 +1,44 @@
+import pandas as pd
+import numpy as np
+import plotly.express as px
+import os
+
+#
+WorkingDirCDrive='C:/temp/summerschool'
+if os.path.exists( WorkingDirCDrive ):
+  WorkingDir = WorkingDirCDrive
+# 
+DiagramFileName= WorkingDir + '/diagrams/dairy-01.png'
+ExcelFileName=WorkingDir + '/sampledata/yoghurt.xlsx'
+print ( DiagramFileName )
+
+#
+df0 = pd.read_excel( ExcelFileName  , sheet_name='Customer' , header=0 , engine='openpyxl'  )
+print( df0.head() )
+
+#
+df1 = df0[ df0["CUSTOMER_POSTAL_CODE"] > 7000 ]
+
+# sunburst does not support nodes which are NULL or NaN
+df2 = df1.replace( np.nan, '', regex=True)
+#
+
+
+grouped = df2.groupby(['CUSTOMER_REGION_NAME','CUSTOMER_SUB_REGION_NAME'])['CUSTOMER_ID'].agg([np.count_nonzero, np.mean, np.std , np.sum , np.min])
+df3 = grouped.reset_index()
+print ( df3 );
+
+
+# indien je express ebruikt
+fig = px.sunburst( df3, path=["CUSTOMER_REGION_NAME","CUSTOMER_SUB_REGION_NAME"], values="count_nonzero" )
+
+#test
+fig.update_layout(
+  title='Segmentbreedte geeft aantal klanten aan'
+)
+
+
+
+fig.write_image( DiagramFileName , width=1980, height=1080 )
+
+quit()

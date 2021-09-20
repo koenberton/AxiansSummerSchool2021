@@ -1,0 +1,38 @@
+import pandas as pd
+import numpy as np
+import plotly.express as px
+import os
+
+#
+WorkingDirCDrive='C:/temp/summerschool'
+if os.path.exists( WorkingDirCDrive ):
+  WorkingDir = WorkingDirCDrive
+# 
+DiagramFileName= WorkingDir + '/diagrams/Covid-01.png'
+ExcelFileName=WorkingDir + '/sampledata/covid.xlsx'
+print ( DiagramFileName )
+
+
+
+df0 = pd.read_excel( ExcelFileName  , sheet_name='HOSP' , header=0 , engine='openpyxl'  )
+print( df0.head() )
+
+
+grouped = df0.groupby(['DATUM','PROVINCE'])['TOTAL_IN'].agg([np.count_nonzero, np.mean, np.std , np.sum])
+df1 = grouped.reset_index()
+print ( df1 );
+
+
+# gebruik de waarde van count_nonzero
+fig = px.box(df0, x="PROVINCE", y="TOTAL_IN"  , points = "all" , title="Ziekenhuisopnames per provincie" )
+
+
+#fig = px.scatter(df1, x="DATUM", y="PROVINCE", size="mean", color="PROVINCE", size_max=50 , title="ddddd")
+
+#fig.update_xaxes(categoryorder='category ascending')
+#fig.update_yaxes(categoryorder='category ascending')
+#fig.title("");
+
+fig.write_image( DiagramFileName , width=1980, height=1080 )
+
+quit()

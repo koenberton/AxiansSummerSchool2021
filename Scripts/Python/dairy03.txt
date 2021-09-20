@@ -1,0 +1,55 @@
+import pandas as pd
+import numpy as np
+import plotly.express as px
+import os
+
+#
+WorkingDirCDrive='C:/temp/summerschool'
+if os.path.exists( WorkingDirCDrive ):
+  WorkingDir = WorkingDirCDrive
+# 
+DiagramFileName= WorkingDir + '/diagrams/dairy-03.png'
+OutputFileName= WorkingDir + '/sampledata/kubus.txt'
+ExcelFileName=WorkingDir + '/sampledata/yoghurt.xlsx'
+print ( DiagramFileName )
+
+#
+df0 = pd.read_excel( ExcelFileName  , sheet_name='Product' , header=0 , engine='openpyxl'  )
+print( df0.head() )
+
+#
+df1 = df0[ df0["MARKET_NAME"] != "NEGEER" ]
+# sunburst does not support nodes which are NULL or NaN
+df2 = df1.replace( np.nan, '', regex=True)
+df3 = df2[["PRODUCT_ID","PRODUCT_NAME","SUB_MARKET_DESCRIPTION"]]
+print( df3 )
+
+#
+df10 = pd.read_excel( ExcelFileName  , sheet_name='Fact' , header=0 , engine='openpyxl'  )
+df12 = df10.replace( np.nan, '', regex=True)
+df14 = df12.groupby(['PRODUCT_ID','CUSTOMER_ID'])['SALES_VALUE'].agg([np.count_nonzero, np.sum ])
+df15 = df14.reset_index()
+print( df15 )
+
+#
+df30 = pd.read_excel( ExcelFileName  , sheet_name='Customer' , header=0 , engine='openpyxl'  )
+df31 = df30.replace( np.nan, '', regex=True)
+df32 = df31[["CUSTOMER_ID","CUSTOMER_REGION_NAME","CUSTOMER_REGION_COORD_X","CUSTOMER_REGION_COORD_Y"]]
+print( df32 )
+
+#
+df20 = pd.merge( df3 , df15 , on="PRODUCT_ID" )
+df21 = pd.merge( df20 , df32 , on="CUSTOMER_ID" )
+print( df21 )
+
+#
+df21.to_csv( OutputFileName, index=False)
+
+# indien je express gebruikt
+fig = px.sunburst( df21, path=["CUSTOMER_REGION_NAME","SUB_MARKET_DESCRIPTION"], values="sum" )
+
+#
+fig.update_layout( title='Yoghurt verkoop')
+fig.write_image( DiagramFileName , width=1980, height=1080 )
+
+quit()

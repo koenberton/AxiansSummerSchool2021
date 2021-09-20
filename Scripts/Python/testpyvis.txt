@@ -1,0 +1,8 @@
+from pyvis.network import Network
+net = Network(directed=True)
+net.add_node(0)
+net.add_node(1)
+net.add_edge(0,1)
+net.show('hoi.html')
+quit()
+

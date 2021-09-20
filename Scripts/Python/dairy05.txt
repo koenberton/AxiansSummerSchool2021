@@ -1,0 +1,43 @@
+import pandas as pd
+import numpy as np
+import plotly.express as px
+import os
+
+#
+WorkingDirCDrive='C:/temp/summerschool'
+if os.path.exists( WorkingDirCDrive ):
+  WorkingDir = WorkingDirCDrive
+# 
+DiagramFileName= WorkingDir + '/diagrams/dairy-05.png'
+FlatFileName=WorkingDir + '/sampledata/kubus.txt'
+print ( DiagramFileName )
+
+# PRODUCT_ID,PRODUCT_NAME,SUB_MARKET_DESCRIPTION,CUSTOMER_ID,count_nonzero,sum,CUSTOMER_REGION_NAME,CUSTOMER_REGION_COORD_X,CUSTOMER_REGION_COORD_Y
+df0 = pd.read_csv( FlatFileName  )
+print( df0.head() )
+
+# alles
+df1 = df0[ df0["CUSTOMER_REGION_NAME"] != "XXXXX" ]
+
+# sunburst does not support nodes which are NULL or NaN
+df2 = df1.replace( np.nan, '', regex=True)
+
+#
+grouped = df2.groupby(['CUSTOMER_REGION_COORD_X','CUSTOMER_REGION_COORD_Y','SUB_MARKET_DESCRIPTION'])['sum'].agg([np.sum])
+df3 = grouped.reset_index()
+
+
+#
+fig = px.scatter(df3, x="CUSTOMER_REGION_COORD_X", y="CUSTOMER_REGION_COORD_Y", size="sum" , color="SUB_MARKET_DESCRIPTION", size_max=50 , title="ddddd")
+
+
+#test
+fig.update_layout(
+  title='Verkoop per regio'
+)
+
+
+
+fig.write_image( DiagramFileName , width=1980, height=1080 )
+
+quit()

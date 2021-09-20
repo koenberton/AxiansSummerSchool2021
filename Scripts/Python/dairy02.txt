@@ -1,0 +1,44 @@
+import pandas as pd
+import numpy as np
+import plotly.express as px
+import os
+
+#
+WorkingDirCDrive='C:/temp/summerschool'
+if os.path.exists( WorkingDirCDrive ):
+  WorkingDir = WorkingDirCDrive
+# 
+DiagramFileName= WorkingDir + '/diagrams/dairy-02.png'
+ExcelFileName=WorkingDir + '/sampledata/yoghurt.xlsx'
+print ( DiagramFileName )
+
+#
+df0 = pd.read_excel( ExcelFileName  , sheet_name='Product' , header=0 , engine='openpyxl'  )
+print( df0.head() )
+
+#
+df1 = df0[ df0["MARKET_NAME"] != "NEGEER" ]
+
+# sunburst does not support nodes which are NULL or NaN
+df2 = df1.replace( np.nan, '', regex=True)
+#
+
+
+grouped = df2.groupby(['SUB_MARKET_DESCRIPTION','PRODUCT_NAME'])['PRODUCT_ID'].agg([np.count_nonzero, np.mean, np.std , np.sum , np.min])
+df3 = grouped.reset_index()
+print ( df3 );
+
+
+# indien je express ebruikt
+fig = px.sunburst( df3, path=["SUB_MARKET_DESCRIPTION","PRODUCT_NAME"], values="count_nonzero" )
+
+#test
+fig.update_layout(
+  title='Yoghurt product gamma'
+)
+
+
+
+fig.write_image( DiagramFileName , width=1980, height=1080 )
+
+quit()

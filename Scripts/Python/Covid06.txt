@@ -1,0 +1,34 @@
+import pandas as pd
+import numpy as np
+import plotly.express as px
+import os
+
+#
+WorkingDirCDrive='C:/temp/summerschool'
+if os.path.exists( WorkingDirCDrive ):
+  WorkingDir = WorkingDirCDrive
+# 
+DiagramFileName= WorkingDir + '/diagrams/Covid-06.png'
+ExcelFileName=WorkingDir + '/sampledata/covid.xlsx'
+print ( DiagramFileName )
+
+
+
+df0 = pd.read_excel( ExcelFileName  , sheet_name='HOSP' , header=0 , engine='openpyxl'  )
+print( df0.head() )
+
+
+grouped = df0.groupby(['NEW_IN','NEW_OUT'])['TOTAL_IN'].agg([np.count_nonzero, np.mean, np.std , np.sum , np.min])
+df1 = grouped.reset_index()
+print ( df1 );
+
+
+fig = px.scatter(df1, x="NEW_IN", y="NEW_OUT" , size="amin" , color="mean", size_max=50 , title="ddddd")
+
+#fig.update_xaxes(categoryorder='category ascending')
+#fig.update_yaxes(categoryorder='category ascending')
+#fig.title("");
+
+fig.write_image( DiagramFileName , width=1980, height=1080 )
+
+quit()
