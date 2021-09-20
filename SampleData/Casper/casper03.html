@@ -1,0 +1,212 @@
+<html>
+<head>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.css" type="text/css" />
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis-network.min.js"> </script>
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+
+<style type="text/css">
+
+        #mynetwork {
+            width: 100%;
+            height: 750px;
+            background-color: #222222;
+            border: 1px solid lightgray;
+            position: relative;
+            float: left;
+        }
+
+        
+        #loadingBar {
+            position:absolute;
+            top:0px;
+            left:0px;
+            width: 100%;
+            height: 750px;
+            background-color:rgba(200,200,200,0.8);
+            -webkit-transition: all 0.5s ease;
+            -moz-transition: all 0.5s ease;
+            -ms-transition: all 0.5s ease;
+            -o-transition: all 0.5s ease;
+            transition: all 0.5s ease;
+            opacity:1;
+        }
+
+        #bar {
+            position:absolute;
+            top:0px;
+            left:0px;
+            width:20px;
+            height:20px;
+            margin:auto auto auto auto;
+            border-radius:11px;
+            border:2px solid rgba(30,30,30,0.05);
+            background: rgb(0, 173, 246); /* Old browsers */
+            box-shadow: 2px 0px 4px rgba(0,0,0,0.4);
+        }
+
+        #border {
+            position:absolute;
+            top:10px;
+            left:10px;
+            width:500px;
+            height:23px;
+            margin:auto auto auto auto;
+            box-shadow: 0px 0px 4px rgba(0,0,0,0.2);
+            border-radius:10px;
+        }
+
+        #text {
+            position:absolute;
+            top:8px;
+            left:530px;
+            width:30px;
+            height:50px;
+            margin:auto auto auto auto;
+            font-size:22px;
+            color: #000000;
+        }
+
+        div.outerBorder {
+            position:relative;
+            top:400px;
+            width:600px;
+            height:44px;
+            margin:auto auto auto auto;
+            border:8px solid rgba(0,0,0,0.1);
+            background: rgb(252,252,252); /* Old browsers */
+            background: -moz-linear-gradient(top,  rgba(252,252,252,1) 0%, rgba(237,237,237,1) 100%); /* FF3.6+ */
+            background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(252,252,252,1)), color-stop(100%,rgba(237,237,237,1))); /* Chrome,Safari4+ */
+            background: -webkit-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* Chrome10+,Safari5.1+ */
+            background: -o-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* Opera 11.10+ */
+            background: -ms-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* IE10+ */
+            background: linear-gradient(to bottom,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* W3C */
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcfcfc', endColorstr='#ededed',GradientType=0 ); /* IE6-9 */
+            border-radius:72px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+        }
+        
+
+        
+
+        
+</style>
+
+</head>
+
+<body>
+<div id = "mynetwork"></div>
+
+<div id="loadingBar">
+    <div class="outerBorder">
+        <div id="text">0%</div>
+        <div id="border">
+            <div id="bar"></div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+    // initialize global variables.
+    var edges;
+    var nodes;
+    var network; 
+    var container;
+    var options, data;
+
+    
+    // This method is responsible for drawing the graph, returns the drawn network
+    function drawGraph() {
+        var container = document.getElementById('mynetwork');
+        
+        
+
+        // parsing and collecting nodes and edges from the python
+        nodes = new vis.DataSet([{"font": {"color": "white"}, "id": "[UID-1]", "label": "[UID-1]", "shape": "dot", "title": "nil"}, {"font": {"color": "white"}, "id": "[UID5277563950925]", "label": "[UID5277563950925]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID5277563950926]", "label": "[UID5277563950926]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID5277563950927]", "label": "[UID5277563950927]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID111]", "label": "[UID111]", "shape": "dot", "title": "mijn"}, {"font": {"color": "white"}, "id": "[UID5277563950928]", "label": "[UID5277563950928]", "shape": "dot", "title": "mijn"}, {"font": {"color": "white"}, "id": "[UID5277563950929]", "label": "[UID5277563950929]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID5277563950930]", "label": "[UID5277563950930]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID5277563950931]", "label": "[UID5277563950931]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID5277563950932]", "label": "[UID5277563950932]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID110]", "label": "[UID110]", "shape": "dot", "title": "gefnuikt"}, {"font": {"color": "white"}, "id": "[UID5277563950933]", "label": "[UID5277563950933]", "shape": "dot", "title": "g"}, {"font": {"color": "white"}, "id": "[UID5277563950934]", "label": "[UID5277563950934]", "shape": "dot", "title": "e"}, {"font": {"color": "white"}, "id": "[UID5277563950935]", "label": "[UID5277563950935]", "shape": "dot", "title": "f"}, {"font": {"color": "white"}, "id": "[UID5277563950936]", "label": "[UID5277563950936]", "shape": "dot", "title": "nuikt"}, {"font": {"color": "white"}, "id": "[UID109]", "label": "[UID109]", "shape": "dot", "title": "ben"}, {"font": {"color": "white"}, "id": "[UID5277563950937]", "label": "[UID5277563950937]", "shape": "dot", "title": "b"}, {"font": {"color": "white"}, "id": "[UID5277563950938]", "label": "[UID5277563950938]", "shape": "dot", "title": "e"}, {"font": {"color": "white"}, "id": "[UID5277563950939]", "label": "[UID5277563950939]", "shape": "dot", "title": "n"}, {"font": {"color": "white"}, "id": "[UID108]", "label": "[UID108]", "shape": "dot", "title": "Ik"}, {"font": {"color": "white"}, "id": "[UID5277563950940]", "label": "[UID5277563950940]", "shape": "dot", "title": "i"}, {"font": {"color": "white"}, "id": "[UID5277563950941]", "label": "[UID5277563950941]", "shape": "dot", "title": "k"}, {"font": {"color": "white"}, "id": "[UID5277563950942]", "label": "[UID5277563950942]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID113]", "label": "[UID113]", "shape": "dot", "title": "zelfsituationele"}, {"font": {"color": "white"}, "id": "[UID5277563950943]", "label": "[UID5277563950943]", "shape": "dot", "title": "z"}, {"font": {"color": "white"}, "id": "[UID5277563950944]", "label": "[UID5277563950944]", "shape": "dot", "title": "e"}, {"font": {"color": "white"}, "id": "[UID5277563950945]", "label": "[UID5277563950945]", "shape": "dot", "title": "l"}, {"font": {"color": "white"}, "id": "[UID5277563950946]", "label": "[UID5277563950946]", "shape": "dot", "title": "f"}, {"font": {"color": "white"}, "id": "[UID5277563950947]", "label": "[UID5277563950947]", "shape": "dot", "title": "s"}, {"font": {"color": "white"}, "id": "[UID5277563950948]", "label": "[UID5277563950948]", "shape": "dot", "title": "i"}, {"font": {"color": "white"}, "id": "[UID5277563950949]", "label": "[UID5277563950949]", "shape": "dot", "title": "t"}, {"font": {"color": "white"}, "id": "[UID5277563950950]", "label": "[UID5277563950950]", "shape": "dot", "title": "u"}, {"font": {"color": "white"}, "id": "[UID5277563950951]", "label": "[UID5277563950951]", "shape": "dot", "title": "a"}, {"font": {"color": "white"}, "id": "[UID5277563950952]", "label": "[UID5277563950952]", "shape": "dot", "title": "t"}, {"font": {"color": "white"}, "id": "[UID5277563950953]", "label": "[UID5277563950953]", "shape": "dot", "title": "i"}, {"font": {"color": "white"}, "id": "[UID5277563950954]", "label": "[UID5277563950954]", "shape": "dot", "title": "o"}, {"font": {"color": "white"}, "id": "[UID5277563950955]", "label": "[UID5277563950955]", "shape": "dot", "title": "n"}, {"font": {"color": "white"}, "id": "[UID5277563950956]", "label": "[UID5277563950956]", "shape": "dot", "title": "e"}, {"font": {"color": "white"}, "id": "[UID5277563950957]", "label": "[UID5277563950957]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID112]", "label": "[UID112]", "shape": "dot", "title": "basale"}, {"font": {"color": "white"}, "id": "[UID5277563950958]", "label": "[UID5277563950958]", "shape": "dot", "title": "b"}, {"font": {"color": "white"}, "id": "[UID5277563950959]", "label": "[UID5277563950959]", "shape": "dot", "title": "a"}, {"font": {"color": "white"}, "id": "[UID5277563950960]", "label": "[UID5277563950960]", "shape": "dot", "title": "s"}, {"font": {"color": "white"}, "id": "[UID5277563950961]", "label": "[UID5277563950961]", "shape": "dot", "title": "a"}, {"font": {"color": "white"}, "id": "[UID5277563950962]", "label": "[UID5277563950962]", "shape": "dot", "title": "le"}, {"font": {"color": "white"}, "id": "[UID118]", "label": "[UID118]", "shape": "dot", "title": "een"}, {"font": {"color": "white"}, "id": "[UID5277563950963]", "label": "[UID5277563950963]", "shape": "dot", "title": "e"}, {"font": {"color": "white"}, "id": "[UID5277563950964]", "label": "[UID5277563950964]", "shape": "dot", "title": "e"}, {"font": {"color": "white"}, "id": "[UID5277563950965]", "label": "[UID5277563950965]", "shape": "dot", "title": "n"}, {"font": {"color": "white"}, "id": "[UID117]", "label": "[UID117]", "shape": "dot", "title": "in"}, {"font": {"color": "white"}, "id": "[UID5277563950966]", "label": "[UID5277563950966]", "shape": "dot", "title": "i"}, {"font": {"color": "white"}, "id": "[UID5277563950967]", "label": "[UID5277563950967]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID5277563950968]", "label": "[UID5277563950968]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID5277563950969]", "label": "[UID5277563950969]", "shape": "dot", "title": "n"}, {"font": {"color": "white"}, "id": "[UID5277563950970]", "label": "[UID5277563950970]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID5277563950971]", "label": "[UID5277563950971]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID5277563950972]", "label": "[UID5277563950972]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID5277563950973]", "label": "[UID5277563950973]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID5277563950974]", "label": "[UID5277563950974]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID114]", "label": "[UID114]", "shape": "dot", "title": "anima"}, {"font": {"color": "white"}, "id": "[UID5277563950975]", "label": "[UID5277563950975]", "shape": "dot", "title": "a"}, {"font": {"color": "white"}, "id": "[UID115]", "label": "[UID115]", "shape": "dot", "title": "is"}, {"font": {"color": "white"}, "id": "[UID5277563950976]", "label": "[UID5277563950976]", "shape": "dot", "title": "i"}, {"font": {"color": "white"}, "id": "[UID5277563950977]", "label": "[UID5277563950977]", "shape": "dot", "title": "n"}, {"font": {"color": "white"}, "id": "[UID5277563950978]", "label": "[UID5277563950978]", "shape": "dot", "title": "n"}, {"font": {"color": "white"}, "id": "[UID5277563950979]", "label": "[UID5277563950979]", "shape": "dot", "title": "i"}, {"font": {"color": "white"}, "id": "[UID5277563950980]", "label": "[UID5277563950980]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID5277563950981]", "label": "[UID5277563950981]", "shape": "dot", "title": "ma"}, {"font": {"color": "white"}, "id": "[UID120]", "label": "[UID120]", "shape": "dot", "title": "interdependente"}, {"font": {"color": "white"}, "id": "[UID5277563950982]", "label": "[UID5277563950982]", "shape": "dot", "title": "i"}, {"font": {"color": "white"}, "id": "[UID5277563950983]", "label": "[UID5277563950983]", "shape": "dot", "title": "n"}, {"font": {"color": "white"}, "id": "[UID5277563950984]", "label": "[UID5277563950984]", "shape": "dot", "title": "t"}, {"font": {"color": "white"}, "id": "[UID5277563950985]", "label": "[UID5277563950985]", "shape": "dot", "title": "e"}, {"font": {"color": "white"}, "id": "[UID5277563950986]", "label": "[UID5277563950986]", "shape": "dot", "title": "r"}, {"font": {"color": "white"}, "id": "[UID5277563950987]", "label": "[UID5277563950987]", "shape": "dot", "title": "d"}, {"font": {"color": "white"}, "id": "[UID5277563950988]", "label": "[UID5277563950988]", "shape": "dot", "title": "e"}, {"font": {"color": "white"}, "id": "[UID5277563950989]", "label": "[UID5277563950989]", "shape": "dot", "title": "p"}, {"font": {"color": "white"}, "id": "[UID5277563950990]", "label": "[UID5277563950990]", "shape": "dot", "title": "e"}, {"font": {"color": "white"}, "id": "[UID5277563950991]", "label": "[UID5277563950991]", "shape": "dot", "title": "n"}, {"font": {"color": "white"}, "id": "[UID5277563950992]", "label": "[UID5277563950992]", "shape": "dot", "title": "d"}, {"font": {"color": "white"}, "id": "[UID5277563950993]", "label": "[UID5277563950993]", "shape": "dot", "title": "e"}, {"font": {"color": "white"}, "id": "[UID5277563950994]", "label": "[UID5277563950994]", "shape": "dot", "title": "n"}, {"font": {"color": "white"}, "id": "[UID119]", "label": "[UID119]", "shape": "dot", "title": "toxische"}, {"font": {"color": "white"}, "id": "[UID5277563950995]", "label": "[UID5277563950995]", "shape": "dot", "title": "t"}, {"font": {"color": "white"}, "id": "[UID5277563950996]", "label": "[UID5277563950996]", "shape": "dot", "title": "o"}, {"font": {"color": "white"}, "id": "[UID5277563950997]", "label": "[UID5277563950997]", "shape": "dot", "title": "te"}, {"font": {"color": "white"}, "id": "[UID5277563950998]", "label": "[UID5277563950998]", "shape": "dot", "title": "x"}, {"font": {"color": "white"}, "id": "[UID5277563950999]", "label": "[UID5277563950999]", "shape": "dot", "title": "i"}, {"font": {"color": "white"}, "id": "[UID5277563951000]", "label": "[UID5277563951000]", "shape": "dot", "title": "s"}, {"font": {"color": "white"}, "id": "[UID5277563951001]", "label": "[UID5277563951001]", "shape": "dot", "title": "c"}, {"font": {"color": "white"}, "id": "[UID5277563951002]", "label": "[UID5277563951002]", "shape": "dot", "title": "h"}, {"font": {"color": "white"}, "id": "[UID5277563951003]", "label": "[UID5277563951003]", "shape": "dot", "title": "e"}, {"font": {"color": "white"}, "id": "[UID5277563951004]", "label": "[UID5277563951004]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID5277563951005]", "label": "[UID5277563951005]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID5277563951006]", "label": "[UID5277563951006]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID5277563951007]", "label": "[UID5277563951007]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID5277563951008]", "label": "[UID5277563951008]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID5277563951009]", "label": "[UID5277563951009]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID5277563951010]", "label": "[UID5277563951010]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID5277563951011]", "label": "[UID5277563951011]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID5277563951012]", "label": "[UID5277563951012]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID5277563951013]", "label": "[UID5277563951013]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID121]", "label": "[UID121]", "shape": "dot", "title": "disfunctionaliteit"}, {"font": {"color": "white"}, "id": "[UID5277563951014]", "label": "[UID5277563951014]", "shape": "dot", "title": "d"}, {"font": {"color": "white"}, "id": "[UID5277563951015]", "label": "[UID5277563951015]", "shape": "dot", "title": "i"}, {"font": {"color": "white"}, "id": "[UID5277563951016]", "label": "[UID5277563951016]", "shape": "dot", "title": "s"}, {"font": {"color": "white"}, "id": "[UID5277563951017]", "label": "[UID5277563951017]", "shape": "dot", "title": "f"}, {"font": {"color": "white"}, "id": "[UID5277563951018]", "label": "[UID5277563951018]", "shape": "dot", "title": "u"}, {"font": {"color": "white"}, "id": "[UID5277563951019]", "label": "[UID5277563951019]", "shape": "dot", "title": "c"}, {"font": {"color": "white"}, "id": "[UID5277563951020]", "label": "[UID5277563951020]", "shape": "dot", "title": "t"}, {"font": {"color": "white"}, "id": "[UID5277563951021]", "label": "[UID5277563951021]", "shape": "dot", "title": "ionalteit"}, {"font": {"color": "white"}, "id": "[UID5277563951022]", "label": "[UID5277563951022]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID122]", "label": "[UID122]", "shape": "dot", "title": "Casper Figuurtje"}, {"font": {"color": "white"}, "id": "[UID5277563951023]", "label": "[UID5277563951023]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID5277563951024]", "label": "[UID5277563951024]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID5277563951025]", "label": "[UID5277563951025]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID5277563951026]", "label": "[UID5277563951026]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID5277563951027]", "label": "[UID5277563951027]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID5277563951028]", "label": "[UID5277563951028]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID5277563951029]", "label": "[UID5277563951029]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID5277563951030]", "label": "[UID5277563951030]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID5277563951031]", "label": "[UID5277563951031]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID5277563951032]", "label": "[UID5277563951032]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID5277563951033]", "label": "[UID5277563951033]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID5277563951034]", "label": "[UID5277563951034]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID5277563951035]", "label": "[UID5277563951035]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID1000]", "label": "[UID1000]", "shape": "dot", "title": "Plaatje"}, {"font": {"color": "white"}, "id": "[UID100]", "label": "[UID100]", "shape": "dot", "title": "?"}, {"font": {"color": "white"}, "id": "[UID200]", "label": "[UID200]", "shape": "dot", "title": "ik ben gefunuikt mijn basale zelfsituationele anima is klemgezet in een toxische interdependente disfunctionaliteit"}, {"font": {"color": "white"}, "id": "[UID116]", "label": "[UID116]", "shape": "dot", "title": "klemgezet"}, {"font": {"color": "white"}, "id": "[UID0]", "label": "[UID0]", "shape": "dot", "title": "[UID0]"}]);
+        edges = new vis.DataSet([{"from": "[UID-1]", "to": "[UID5277563950925]", "value": 1}, {"from": "[UID-1]", "to": "[UID5277563950926]", "value": 1}, {"from": "[UID-1]", "to": "[UID5277563950927]", "value": 1}, {"from": "[UID111]", "to": "[UID5277563950928]", "value": 1}, {"from": "[UID-1]", "to": "[UID5277563950929]", "value": 1}, {"from": "[UID-1]", "to": "[UID5277563950930]", "value": 1}, {"from": "[UID-1]", "to": "[UID5277563950931]", "value": 1}, {"from": "[UID-1]", "to": "[UID5277563950932]", "value": 1}, {"from": "[UID110]", "to": "[UID5277563950933]", "value": 1}, {"from": "[UID110]", "to": "[UID5277563950934]", "value": 1}, {"from": "[UID110]", "to": "[UID5277563950935]", "value": 1}, {"from": "[UID110]", "to": "[UID5277563950936]", "value": 1}, {"from": "[UID109]", "to": "[UID5277563950937]", "value": 1}, {"from": "[UID109]", "to": "[UID5277563950938]", "value": 1}, {"from": "[UID109]", "to": "[UID5277563950939]", "value": 1}, {"from": "[UID108]", "to": "[UID5277563950940]", "value": 1}, {"from": "[UID108]", "to": "[UID5277563950941]", "value": 1}, {"from": "[UID-1]", "to": "[UID5277563950942]", "value": 1}, {"from": "[UID113]", "to": "[UID5277563950943]", "value": 1}, {"from": "[UID113]", "to": "[UID5277563950944]", "value": 1}, {"from": "[UID113]", "to": "[UID5277563950945]", "value": 1}, {"from": "[UID113]", "to": "[UID5277563950946]", "value": 1}, {"from": "[UID113]", "to": "[UID5277563950947]", "value": 1}, {"from": "[UID113]", "to": "[UID5277563950948]", "value": 1}, {"from": "[UID113]", "to": "[UID5277563950949]", "value": 1}, {"from": "[UID113]", "to": "[UID5277563950950]", "value": 1}, {"from": "[UID113]", "to": "[UID5277563950951]", "value": 1}, {"from": "[UID113]", "to": "[UID5277563950952]", "value": 1}, {"from": "[UID113]", "to": "[UID5277563950953]", "value": 1}, {"from": "[UID113]", "to": "[UID5277563950954]", "value": 1}, {"from": "[UID113]", "to": "[UID5277563950955]", "value": 1}, {"from": "[UID113]", "to": "[UID5277563950956]", "value": 1}, {"from": "[UID-1]", "to": "[UID5277563950957]", "value": 1}, {"from": "[UID112]", "to": "[UID5277563950958]", "value": 1}, {"from": "[UID112]", "to": "[UID5277563950959]", "value": 1}, {"from": "[UID112]", "to": "[UID5277563950960]", "value": 1}, {"from": "[UID112]", "to": "[UID5277563950961]", "value": 1}, {"from": "[UID112]", "to": "[UID5277563950962]", "value": 1}, {"from": "[UID118]", "to": "[UID5277563950963]", "value": 1}, {"from": "[UID118]", "to": "[UID5277563950964]", "value": 1}, {"from": "[UID118]", "to": "[UID5277563950965]", "value": 1}, {"from": "[UID117]", "to": "[UID5277563950966]", "value": 1}, {"from": "[UID-1]", "to": "[UID5277563950967]", "value": 1}, {"from": "[UID-1]", "to": "[UID5277563950968]", "value": 1}, {"from": "[UID117]", "to": "[UID5277563950969]", "value": 1}, {"from": "[UID-1]", "to": "[UID5277563950970]", "value": 1}, {"from": "[UID-1]", "to": "[UID5277563950971]", "value": 1}, {"from": "[UID-1]", "to": "[UID5277563950972]", "value": 1}, {"from": "[UID-1]", "to": "[UID5277563950973]", "value": 1}, {"from": "[UID-1]", "to": "[UID5277563950974]", "value": 1}, {"from": "[UID114]", "to": "[UID5277563950975]", "value": 1}, {"from": "[UID115]", "to": "[UID5277563950976]", "value": 1}, {"from": "[UID115]", "to": "[UID5277563950977]", "value": 1}, {"from": "[UID114]", "to": "[UID5277563950978]", "value": 1}, {"from": "[UID114]", "to": "[UID5277563950979]", "value": 1}, {"from": "[UID-1]", "to": "[UID5277563950980]", "value": 1}, {"from": "[UID114]", "to": "[UID5277563950981]", "value": 1}, {"from": "[UID120]", "to": "[UID5277563950982]", "value": 1}, {"from": "[UID120]", "to": "[UID5277563950983]", "value": 1}, {"from": "[UID120]", "to": "[UID5277563950984]", "value": 1}, {"from": "[UID120]", "to": "[UID5277563950985]", "value": 1}, {"from": "[UID120]", "to": "[UID5277563950986]", "value": 1}, {"from": "[UID120]", "to": "[UID5277563950987]", "value": 1}, {"from": "[UID120]", "to": "[UID5277563950988]", "value": 1}, {"from": "[UID120]", "to": "[UID5277563950989]", "value": 1}, {"from": "[UID120]", "to": "[UID5277563950990]", "value": 1}, {"from": "[UID120]", "to": "[UID5277563950991]", "value": 1}, {"from": "[UID120]", "to": "[UID5277563950992]", "value": 1}, {"from": "[UID120]", "to": "[UID5277563950993]", "value": 1}, {"from": "[UID120]", "to": "[UID5277563950994]", "value": 1}, {"from": "[UID119]", "to": "[UID5277563950995]", "value": 1}, {"from": "[UID119]", "to": "[UID5277563950996]", "value": 1}, {"from": "[UID120]", "to": "[UID5277563950997]", "value": 1}, {"from": "[UID119]", "to": "[UID5277563950998]", "value": 1}, {"from": "[UID119]", "to": "[UID5277563950999]", "value": 1}, {"from": "[UID119]", "to": "[UID5277563951000]", "value": 1}, {"from": "[UID119]", "to": "[UID5277563951001]", "value": 1}, {"from": "[UID119]", "to": "[UID5277563951002]", "value": 1}, {"from": "[UID119]", "to": "[UID5277563951003]", "value": 1}, {"from": "[UID-1]", "to": "[UID5277563951004]", "value": 1}, {"from": "[UID-1]", "to": "[UID5277563951005]", "value": 1}, {"from": "[UID-1]", "to": "[UID5277563951006]", "value": 1}, {"from": "[UID-1]", "to": "[UID5277563951007]", "value": 1}, {"from": "[UID-1]", "to": "[UID5277563951008]", "value": 1}, {"from": "[UID-1]", "to": "[UID5277563951009]", "value": 1}, {"from": "[UID-1]", "to": "[UID5277563951010]", "value": 1}, {"from": "[UID-1]", "to": "[UID5277563951011]", "value": 1}, {"from": "[UID-1]", "to": "[UID5277563951012]", "value": 1}, {"from": "[UID-1]", "to": "[UID5277563951013]", "value": 1}, {"from": "[UID121]", "to": "[UID5277563951014]", "value": 1}, {"from": "[UID121]", "to": "[UID5277563951015]", "value": 1}, {"from": "[UID121]", "to": "[UID5277563951016]", "value": 1}, {"from": "[UID121]", "to": "[UID5277563951017]", "value": 1}, {"from": "[UID121]", "to": "[UID5277563951018]", "value": 1}, {"from": "[UID121]", "to": "[UID5277563951019]", "value": 1}, {"from": "[UID121]", "to": "[UID5277563951020]", "value": 1}, {"from": "[UID121]", "to": "[UID5277563951021]", "value": 1}, {"from": "[UID-1]", "to": "[UID5277563951022]", "value": 1}, {"from": "[UID122]", "to": "[UID5277563951023]", "value": 1}, {"from": "[UID122]", "to": "[UID5277563951024]", "value": 1}, {"from": "[UID122]", "to": "[UID5277563951025]", "value": 1}, {"from": "[UID-1]", "to": "[UID5277563951026]", "value": 1}, {"from": "[UID122]", "to": "[UID5277563951027]", "value": 1}, {"from": "[UID122]", "to": "[UID5277563951028]", "value": 1}, {"from": "[UID122]", "to": "[UID5277563951029]", "value": 1}, {"from": "[UID122]", "to": "[UID5277563951030]", "value": 1}, {"from": "[UID122]", "to": "[UID5277563951031]", "value": 1}, {"from": "[UID122]", "to": "[UID5277563951032]", "value": 1}, {"from": "[UID122]", "to": "[UID5277563951033]", "value": 1}, {"from": "[UID122]", "to": "[UID5277563951034]", "value": 1}, {"from": "[UID122]", "to": "[UID5277563951035]", "value": 1}, {"from": "[UID1000]", "to": "[UID100]", "value": 1}, {"from": "[UID200]", "to": "[UID108]", "value": 1}, {"from": "[UID200]", "to": "[UID109]", "value": 1}, {"from": "[UID200]", "to": "[UID110]", "value": 1}, {"from": "[UID200]", "to": "[UID111]", "value": 1}, {"from": "[UID200]", "to": "[UID112]", "value": 1}, {"from": "[UID200]", "to": "[UID113]", "value": 1}, {"from": "[UID200]", "to": "[UID114]", "value": 1}, {"from": "[UID200]", "to": "[UID115]", "value": 1}, {"from": "[UID200]", "to": "[UID116]", "value": 1}, {"from": "[UID200]", "to": "[UID117]", "value": 1}, {"from": "[UID200]", "to": "[UID118]", "value": 1}, {"from": "[UID200]", "to": "[UID119]", "value": 1}, {"from": "[UID200]", "to": "[UID120]", "value": 1}, {"from": "[UID200]", "to": "[UID121]", "value": 1}, {"from": "[UID1000]", "to": "[UID122]", "value": 1}, {"from": "[UID1000]", "to": "[UID200]", "value": 1}, {"from": "[UID0]", "to": "[UID1000]", "value": 1}, {"from": "[UID-1]", "to": "[UID-1]", "value": 1}]);
+
+        // adding nodes and edges to the graph
+        data = {nodes: nodes, edges: edges};
+
+        var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": false,
+            "type": "continuous"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "barnesHut": {
+            "avoidOverlap": 0,
+            "centralGravity": 0.3,
+            "damping": 0.09,
+            "gravitationalConstant": -80000,
+            "springConstant": 0.001,
+            "springLength": 250
+        },
+        "enabled": true,
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+        
+        
+
+        
+
+        network = new vis.Network(container, data, options);
+	 
+        
+
+
+        
+        network.on("stabilizationProgress", function(params) {
+      		document.getElementById('loadingBar').removeAttribute("style");
+	        var maxWidth = 496;
+	        var minWidth = 20;
+	        var widthFactor = params.iterations/params.total;
+	        var width = Math.max(minWidth,maxWidth * widthFactor);
+
+	        document.getElementById('bar').style.width = width + 'px';
+	        document.getElementById('text').innerHTML = Math.round(widthFactor*100) + '%';
+	    });
+	    network.once("stabilizationIterationsDone", function() {
+	        document.getElementById('text').innerHTML = '100%';
+	        document.getElementById('bar').style.width = '496px';
+	        document.getElementById('loadingBar').style.opacity = 0;
+	        // really clean the dom element
+	        setTimeout(function () {document.getElementById('loadingBar').style.display = 'none';}, 500);
+	    });
+        
+
+        return network;
+
+    }
+
+    drawGraph();
+
+</script>
+</body>
+</html>
